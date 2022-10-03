@@ -194,10 +194,21 @@ class Ui_Dialog(object):
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
+        Dialog.setTabOrder(self.boxA, self.boxB)
+        Dialog.setTabOrder(self.boxB, self.boxC)
+        Dialog.setTabOrder(self.boxC, self.boxK)
+        Dialog.setTabOrder(self.boxK, self.boxE)
+        Dialog.setTabOrder(self.boxE, self.rangeA)
+        Dialog.setTabOrder(self.rangeA, self.rangeB)
+        Dialog.setTabOrder(self.rangeB, self.buttonDihotomy)
+        Dialog.setTabOrder(self.buttonDihotomy, self.buttonNeuton)
+        Dialog.setTabOrder(self.buttonNeuton, self.buttonSecant)
+        Dialog.setTabOrder(self.buttonSecant, self.buttonParabola)
+        Dialog.setTabOrder(self.buttonParabola, self.outputField)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        Dialog.setWindowTitle(_translate("Dialog", "Created by cosm1c"))
         self.label_5.setText(_translate("Dialog", "b"))
         self.label.setText(_translate("Dialog", "Решение нелинейного уравнения"))
         self.label_7.setText(_translate("Dialog", "k"))

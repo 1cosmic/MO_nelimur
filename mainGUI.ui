@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Created by cosm1c</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="3" column="2">
@@ -399,6 +399,20 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>boxA</tabstop>
+  <tabstop>boxB</tabstop>
+  <tabstop>boxC</tabstop>
+  <tabstop>boxK</tabstop>
+  <tabstop>boxE</tabstop>
+  <tabstop>rangeA</tabstop>
+  <tabstop>rangeB</tabstop>
+  <tabstop>buttonDihotomy</tabstop>
+  <tabstop>buttonNeuton</tabstop>
+  <tabstop>buttonSecant</tabstop>
+  <tabstop>buttonParabola</tabstop>
+  <tabstop>outputField</tabstop>
+ </tabstops>
  <resources>
   <include location="sourceOfGUI.qrc"/>
  </resources>
