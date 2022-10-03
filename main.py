@@ -16,7 +16,9 @@ def f(x):
 
 def fDif(x):
     # Return answer of difFur.
-    y = (2 * c_a * x + c_b) * sin(c_k * x + c_e) + (c_a * pow(x, 2) + c_b * x + c_c) * cos(c_k * x + c_e)
+    global c_a, c_b, c_c, c_k, c_e
+    y = c_k * (c_a * pow(x, 2) + c_b * x + c_c) * cos(c_k * x + c_e) + (2 * c_a * x + c_b) * sin(c_k * x + c_e)
+
     return y
 
 
@@ -146,7 +148,7 @@ class MainWin(QDialog):
         for i in isolations:
 
             lastX = i[leftWall]
-            h = 10
+            h = 1
 
             while abs(h) > self.ErrorPersent:
 
