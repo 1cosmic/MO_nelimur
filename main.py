@@ -22,6 +22,10 @@ def fDif(x):
     return y
 
 
+def Q(x, ):
+    f_k = f(x)
+
+
 class MainWin(QDialog):
     ErrorPersent: float
 
@@ -34,6 +38,7 @@ class MainWin(QDialog):
         self.ui.setupUi(self)
         self.ui.buttonDihotomy.clicked.connect(self.methodDihotomy)
         self.ui.buttonNeuton.clicked.connect(self.methodNeuton)
+        self.ui.buttonSecant.clicked.connect(self.methodSecant)
 
     def setUserValues(self):
 
@@ -70,16 +75,18 @@ class MainWin(QDialog):
 
     def isolations(self, ifBack=False):
         isolations = []
+        k = 1 / (self.ui.boxK.value() + self.ui.boxE.value())
+        print(k)
 
         if ifBack:
             end = int(self.ui.rangeA.value())
             start = int(self.ui.rangeB.value())
-            step = -1
+            step = -k
 
         else:
             start = int(self.ui.rangeA.value())
             end = int(self.ui.rangeB.value())
-            step = 1
+            step = k
 
         # Generate of intervals.
         intervals = [(i, i + step) for i in range(start, end, step)]
@@ -87,8 +94,8 @@ class MainWin(QDialog):
         # Select interval, who have roots.
         for i in intervals:
 
-            left = int(i[0])
-            right = int(i[1])
+            left = float(i[0])
+            right = float(i[1])
             if f(left) * f(right) < 0:
                 isolations.append(i)
 
@@ -158,44 +165,73 @@ class MainWin(QDialog):
                 if abs(h) <= self.ErrorPersent:
                     roots.append(round(lastX, 2))
 
+
         self.outputRoots(roots)
 
         # ============================================================
         # ДОПИСАТЬ!
         # ============================================================
         #
-        # def methodSecant(self):
-        #     # Calculate roots using method of Secants.
-        #     self.setUserValues()
-        #     self.setTimer()
-        #
-        #     roots = []
-        #
-        #     reverseOrder = True
-        #     leftWall = 1
-        #     isolations = self.isolations(reverseOrder)
-        #
-        #     for i in isolations:
-        #
-        #         secondLastX = 'ДОПИСАТЬ МЕТОД СЕКУЩИХ'
-        #         h = 10
-        #
-        #         lastX = f(i[leftWall])
-        #         secondLastX = f()
-        #
-        #         while abs(h) > self.ErrorPersent:
-        #
-        #             h = (f(lastX) / fDif(lastX))
-        #             lastX -= h
-        #
-        #             if abs(h) <= self.ErrorPersent:
-        #                 roots.append(round(lastX, 2))
-        #
-        #     self.outputRoots(roots)
-        #
-        #     pass
+    def methodSecant(self):
+        # Calculate roots using method of Secants.
+        self.setUserValues()
+        self.setTimer()
+
+        roots = []
+
+        reverseOrder = True
+        isolations = self.isolations(reverseOrder)
+
+        for i in isolations:
+
+            lastX = i[1]
+            secondLastX = i[0]
+            h = 1
+
+            while abs(lastX - secondLastX) > self.ErrorPersent:
+
+                h = ((f(lastX) * (lastX - secondLastX))) / (f(lastX) - f(secondLastX))
+                secondLastX = lastX
+                lastX -= h
+
+                if abs(lastX - secondLastX) <= self.ErrorPersent:
+                    roots.append(round(lastX, 2))
+
+        self.outputRoots(roots)
+
+        pass
         # ============================================================
         # ============================================================
+    def methodParabol(self):
+        # Calculate roots using method of Secants.
+        self.setUserValues()
+        self.setTimer()
+
+        roots = []
+
+        reverseOrder = True
+        isolations = self.isolations(reverseOrder)
+
+        for i in isolations:
+
+
+            lastX = i[1]
+            secondLastX = i[0]
+            threeLastX = (lastX - secondLastX) / 2
+            h = 1
+
+            while abs(lastX - secondLastX) > self.ErrorPersent:
+
+                h = ((f(lastX) * (lastX - secondLastX))) / (f(lastX) - f(secondLastX))
+                secondLastX = lastX
+                lastX -= h
+
+                if abs(lastX - secondLastX) <= self.ErrorPersent:
+                    roots.append(round(lastX, 2))
+
+        self.outputRoots(roots)
+
+        pass
 
     def setTimer(self):
         # Set timer.
