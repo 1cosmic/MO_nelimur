@@ -1,7 +1,8 @@
 import sys
 import time
 
-from math import sin, cos
+from math import sin, cos, sqrt
+import numpy
 
 from PyQt5.QtWidgets import QDialog, QApplication
 from mainGUI import Ui_Dialog
@@ -21,6 +22,22 @@ def fDif(x):
 
     return y
 
+def first_divDiff(x, nextX):
+    # First divisor of difference.
+    result = (f(x) - f(nextX)) / (x - nextX)
+
+    return result
+
+
+def second_divDiff(x, nextX, doubleNextX):
+    # Second divisor of difference.
+
+    divisor = first_divDiff(x, nextX) - first_divDiff(nextX, doubleNextX)
+    denominator = x - doubleNextX
+    result = divisor / denominator
+
+    return result
+
 
 def Q(x, ):
     f_k = f(x)
@@ -39,6 +56,7 @@ class MainWin(QDialog):
         self.ui.buttonDihotomy.clicked.connect(self.methodDihotomy)
         self.ui.buttonNeuton.clicked.connect(self.methodNeuton)
         self.ui.buttonSecant.clicked.connect(self.methodSecant)
+        self.ui.buttonParabola.clicked.connect(self.methodParabol)
 
     def setUserValues(self):
 
@@ -50,7 +68,7 @@ class MainWin(QDialog):
         c_k = self.ui.boxK.value()
         c_e = self.ui.boxE.value()
 
-    def outputRoots(self, roots):
+    def outputRoots(self, roots, iterations):
         # Output values into the box-field.
 
         # Shutdown timer
@@ -69,8 +87,11 @@ class MainWin(QDialog):
         else:
             output.appendPlainText("")
 
-            result = f"Finding of roots: {len(roots)} in {timing}s."
             # output.appendPlainText(result)
+            result = f"Finding of roots: {len(roots)} in {timing}s."
+            output.appendHtml(f"<b>{result}</b>")
+
+            result = f"Count of iterations: {iterations}"
             output.appendHtml(f"<b>{result}</b>")
 
     def isolations(self, ifBack=False):
@@ -89,7 +110,7 @@ class MainWin(QDialog):
             step = k
 
         # Generate of intervals.
-        intervals = [(i, i + step) for i in range(start, end, step)]
+        intervals = [(i, i + step) for i in numpy.arange(start, end, step)]
 
         # Select interval, who have roots.
         for i in intervals:
@@ -111,7 +132,8 @@ class MainWin(QDialog):
         self.setUserValues()
 
         roots = []  # roots of math solver.
-        cRoots = 0  # count of roots (optimization).
+        iterations = 0
+
 
         self.setTimer()
         for i in self.isolations():
@@ -122,6 +144,7 @@ class MainWin(QDialog):
 
             while run:
 
+                iterations += 1
                 c = (a + b) / 2
 
                 if (f(a) * f(c)) <= 0:
@@ -137,7 +160,7 @@ class MainWin(QDialog):
 
         else:
             # print(f"Find of roots: {cRoots}")
-            self.outputRoots(roots)
+            self.outputRoots(roots, iterations)
 
     def methodNeuton(self):
         # Searching roots using method of Neuton.
@@ -147,6 +170,7 @@ class MainWin(QDialog):
         self.setTimer()
 
         roots = []  # roots of math solver.
+        iterations = 0
 
         reverseOrder = True
         isolations = self.isolations(reverseOrder)
@@ -161,12 +185,13 @@ class MainWin(QDialog):
 
                 h = (f(lastX) / fDif(lastX))
                 lastX -= h
+                iterations += 1
 
                 if abs(h) <= self.ErrorPersent:
                     roots.append(round(lastX, 2))
 
 
-        self.outputRoots(roots)
+        self.outputRoots(roots, iterations)
 
         # ============================================================
         # ДОПИСАТЬ!
@@ -178,6 +203,7 @@ class MainWin(QDialog):
         self.setTimer()
 
         roots = []
+        iterations = 0
 
         reverseOrder = True
         isolations = self.isolations(reverseOrder)
@@ -193,11 +219,12 @@ class MainWin(QDialog):
                 h = ((f(lastX) * (lastX - secondLastX))) / (f(lastX) - f(secondLastX))
                 secondLastX = lastX
                 lastX -= h
+                iterations += 1
 
                 if abs(lastX - secondLastX) <= self.ErrorPersent:
                     roots.append(round(lastX, 2))
 
-        self.outputRoots(roots)
+        self.outputRoots(roots, iterations)
 
         pass
         # ============================================================
@@ -208,30 +235,39 @@ class MainWin(QDialog):
         self.setTimer()
 
         roots = []
+        iterations = 0
 
         reverseOrder = True
         isolations = self.isolations(reverseOrder)
 
         for i in isolations:
 
+            k = i[1]
+            k1 = (i[1] - i[0]) / 2
+            k2 = i[0]
 
-            lastX = i[1]
-            secondLastX = i[0]
-            threeLastX = (lastX - secondLastX) / 2
-            h = 1
+            while abs(k1 - k) > self.ErrorPersent:
+                a = (first_divDiff(k, k1) - first_divDiff(k1, k2)) / (k - k2)
+                b = first_divDiff(k, k1) - second_divDiff(k, k1, k2) * (k + k1)
+                c = f(k) - first_divDiff(k, k1) * k + second_divDiff(k, k1, k2) * k * k1
 
-            while abs(lastX - secondLastX) > self.ErrorPersent:
+                x1_ = (-b - sqrt(pow(b, 2) - 4 * a * c)) / (2 * a)
+                x2_ = (-b + sqrt(pow(b, 2) - 4 * a * c)) / (2 * a)
 
-                h = ((f(lastX) * (lastX - secondLastX))) / (f(lastX) - f(secondLastX))
-                secondLastX = lastX
-                lastX -= h
+                k = k1
+                k1 = k2
+                iterations += 1
 
-                if abs(lastX - secondLastX) <= self.ErrorPersent:
-                    roots.append(round(lastX, 2))
+                if abs(f(x1_)) < abs(f(x2_)):
+                    k2 = x1_
+                else:
+                    k2 = x2_
 
-        self.outputRoots(roots)
+            else:
+                roots.append(round(k2, 2))
 
-        pass
+        self.outputRoots(roots, iterations)
+
 
     def setTimer(self):
         # Set timer.
